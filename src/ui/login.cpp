@@ -1,15 +1,16 @@
 #include <lvgl.h>
+#include <map>
 
-#include "settings.hpp"
-#include "ui/homepage.hpp"
-#include "ui/styles.hpp"
-#include "ui/components/menubar.hpp"
+#include <settings.hpp>
+#include <ui/login.hpp>
+#include <ui/styles.hpp>
 
 static void btn_event_cb(lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *btn = (lv_obj_t*)lv_event_get_target(e);
-    if(code == LV_EVENT_CLICKED) {
+    if(code == LV_EVENT_CLICKED)
+    {
         static uint8_t cnt = 0;
         cnt++;
 
@@ -19,13 +20,18 @@ static void btn_event_cb(lv_event_t *e)
     }
 }
 
-void show_homepage() {
-    menubar_init();
+void show_login(std::map<std::string, lv_obj_t*> &objects)
+{
+    for (std::pair<const std::string, lv_obj_t *> &obj: objects) {
+        lv_obj_del(objects[obj.first]);
+    }
+    objects.clear();
 
     lv_obj_t *welcome_label = lv_label_create(lv_screen_active());
     lv_label_set_text(welcome_label, "Welcome to NightLatch");
     lv_obj_add_style(welcome_label, &style_title_text, LV_STATE_DEFAULT);
     lv_obj_align(welcome_label, LV_ALIGN_TOP_MID, 0, 110);
+    objects["welcome_label"] = welcome_label;
 
     lv_obj_t *login_label = lv_label_create(lv_screen_active());
     lv_label_set_text(login_label, "Please login to continue...");

@@ -1,11 +1,12 @@
 #include <lvgl.h>
 
-#include "ui/styles.hpp"
-#include "ui/components/images/logo_header.c"
+#include <ui/styles.hpp>
+#include <ui/components/images/logo_header.c>
 
 LV_IMAGE_DECLARE(logo_header);
 
-void menubar_init(void) {
+void menubar_init(void)
+{
     lv_obj_t *bar = lv_obj_create(lv_screen_active());
     lv_obj_align(bar, LV_ALIGN_TOP_MID, 0, 0);
     lv_obj_set_size(bar, 480, 100);

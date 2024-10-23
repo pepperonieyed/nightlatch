@@ -3,12 +3,12 @@
 #include <Arduino_GFX.h>
 #include <lvgl.h>
 
-#include "nightlatch.hpp"
-#include "touch.hpp"
-#include "sd_card.hpp"
-#include "ui/styles.hpp"
-#include "ui/homepage.hpp"
-#include "ui/sd_error.hpp"
+#include <nightlatch.hpp>
+#include <touch.hpp>
+#include <sd_card.hpp>
+#include <ui/styles.hpp>
+#include <ui/components/menubar.hpp>
+#include <ui/screens.hpp>
 
 /*
  * flush_display
@@ -18,7 +18,8 @@
  * 
  * color_map: Bitmap of colors to write to the area of the display
  */
-void flush_display(lv_display_t *display, const lv_area_t *area, uint8_t *color_map) {
+void flush_display(lv_display_t *display, const lv_area_t *area, uint8_t *color_map)
+{
   uint16_t width = lv_area_get_width(area);
   uint16_t height = lv_area_get_height(area);
 
@@ -32,11 +33,13 @@ void flush_display(lv_display_t *display, const lv_area_t *area, uint8_t *color_
  * -------------------
  * Provides a reference to time for LVGL
 */
-uint32_t tick(void) {
+uint32_t tick(void)
+{
   return millis();
 }
 
-void setup(void) {
+void setup(void)
+{
   // Setup display driver (Arduino_GFX)
   bus = new Arduino_ESP32RGBPanel(
     41, 40, 39, 42, 14, 21, 47, 48, 45, 9, 46, 3, 8, 16, 1, 15, 7, 6, 5, 4,
@@ -82,11 +85,32 @@ void setup(void) {
   // Init styles
   styles_init();
 
-  // Check if SD card inserted
-  sdcard_init() ? show_homepage() : show_sd_error();
+  menubar_init();
+
+  init_screens();
+
+  system_status = NightLatch_Status();
 }
 
-void loop(void) {
+void loop(void)
+{
+  Screen new_screen;
+
+  if (!system_status.is_SD_Inserted())
+  {
+    new_screen = Screen::SD_ERROR;
+  }
+  else {
+    new_screen = Screen::LOGIN;
+  }
+
+  if (new_screen != system_status.getScreen())
+  {
+    // Won't allow setting a screen without an associated function
+    if (system_status.setScreen(new_screen))
+      NightLatch_Screens[new_screen](system_status.getObjects());
+  }
+
   int delta = lv_timer_handler();
   delay(delta);
 }

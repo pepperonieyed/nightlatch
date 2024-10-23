@@ -5,6 +5,7 @@
 #include <TAMC_GT911.h>
 #include <Arduino_GFX_Library.h>
 #include <Arduino_GFX.h>
+#include <status.hpp>
 
 constexpr uint8_t DISP_BL_PIN = 2;
 constexpr uint16_t DISP_WIDTH = 800;
@@ -22,6 +23,8 @@ void flush_display(lv_display_t, const lv_area_t*, uint8_t*);
 uint32_t tick(void);
 
 TAMC_GT911 *touch_screen;
+
+NightLatch_Status system_status;
 
 void setup(void);
 void loop(void);
